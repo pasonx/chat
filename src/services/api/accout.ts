@@ -19,17 +19,23 @@ export async function currentUser(options?: { [key: string]: any }) {
 
 
 /** 退出登录接口 POST /api/login/outLogin */
-export async function outLogin(options?: { [key: string]: any }) {
+export async function outLogin(params?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/login/outLogin', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
     method: 'POST',
-    ...(options || {}),
+    data: (params || {}),
   });
 }
 
 export async function login(params:UserInfo) {
     return request<Record<string, any>>('/api/login', {
       method: 'POST',
-      ...(params || {}),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: (params || {}),
     });
 }
 
@@ -37,7 +43,10 @@ export async function register(params:UserInfo) {
   debugger
     return request<Record<string, any>>('/api/register', {
       method: 'POST',
-      ...(params || {}),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: (params || {}),
     });
 }
   

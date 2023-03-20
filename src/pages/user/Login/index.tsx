@@ -51,7 +51,7 @@ const Login: React.FC = () => {
       if (msg.status === "ok") {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: "pages.login.success",
-          defaultMessage: "登录成功！",
+          defaultMessage: "成功！",
         });
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
@@ -68,7 +68,7 @@ const Login: React.FC = () => {
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: "pages.login.failure",
-        defaultMessage: "登录失败，请重试！",
+        defaultMessage: "失败，请重试！",
       });
       message.error(defaultLoginFailureMessage);
     }
@@ -82,6 +82,7 @@ const Login: React.FC = () => {
       </div>
       <div className={styles.content}>
         <LoginForm
+          key={type}
           submitter={{
             searchConfig: {
               submitText: type === "login" ? "Login" : "Register",
@@ -195,9 +196,6 @@ const Login: React.FC = () => {
             </>
           )}
 
-          {status === "error" && loginType === "register" && (
-            <LoginMessage content="验证码错误" />
-          )}
           {type === "register" && (
             <>
               <ProFormText
@@ -223,7 +221,7 @@ const Login: React.FC = () => {
                 ]}
               />
               <ProFormText
-                name="Email"
+                name="email"
                 fieldProps={{
                   size: "large",
                   prefix: <MailOutlined className={styles.prefixIcon} />,
@@ -242,6 +240,15 @@ const Login: React.FC = () => {
                       />
                     ),
                   },
+                  {
+                    type: 'email',
+                    message: (
+                      <FormattedMessage
+                        id="pages.register.email.invalid"
+                        defaultMessage="请输入有效的邮箱地址!"
+                      />
+                    ),
+                  },
                 ]}
               />
               <ProFormText.Password
@@ -252,7 +259,7 @@ const Login: React.FC = () => {
                 }}
                 placeholder={intl.formatMessage({
                   id: "pages.register.password.placeholder",
-                  defaultMessage: "密码:",
+                  defaultMessage: "至少6位密码，区分大小写",
                 })}
                 rules={[
                   {
@@ -264,28 +271,52 @@ const Login: React.FC = () => {
                       />
                     ),
                   },
+                  {
+                    min: 6,
+                    message: (
+                      <FormattedMessage
+                        id="pages.register.password.minLength"
+                        defaultMessage="密码至少6位，区分大小写"
+                      />
+                    ),
+                  },
                 ]}
               />
               <ProFormText.Password
-                name="confirmPassword"
+                name="confirm"
                 fieldProps={{
                   size: "large",
                   prefix: <LockOutlined className={styles.prefixIcon} />,
                 }}
                 placeholder={intl.formatMessage({
-                  id: "pages.register.confirm.password.placeholder",
-                  defaultMessage: "确认密码:",
+                  id: "pages.register.confirm-password.placeholder",
+                  defaultMessage: "确认密码",
                 })}
                 rules={[
                   {
                     required: true,
                     message: (
                       <FormattedMessage
-                        id="pages.register.confirm.password.required"
+                        id="pages.register.confirm-password.required"
                         defaultMessage="请确认密码！"
                       />
                     ),
                   },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("password") === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error(
+                          intl.formatMessage({
+                            id: "pages.register.password.twice",
+                            defaultMessage: "两次输入的密码不匹配!",
+                          })
+                        )
+                      );
+                    },
+                  }),
                 ]}
               />
             </>
